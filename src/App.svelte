@@ -4,6 +4,7 @@
 
     let emotion: string = 'neutral';
     let isDarkMode: boolean = true;
+    let isSoundOn: boolean = true;
 
     onMount(async () => {
         await loadModels();
@@ -66,6 +67,7 @@
     }
 
     async function tellEmotion(emotion: string) {
+        if (!isSoundOn) return;
         try {
             const utterance = new SpeechSynthesisUtterance(
                 `You look ${emotion}`
@@ -81,6 +83,10 @@
         isDarkMode = !isDarkMode;
         setTheme(isDarkMode);
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    }
+
+    function toggleSound() {
+        isSoundOn = !isSoundOn;
     }
 
     function setTheme(dark: boolean) {
@@ -115,7 +121,56 @@
     class="flex min-h-screen flex-col items-center justify-center p-4 transition-colors duration-300 dark:bg-gray-900 dark:text-white sm:py-20 gap-5"
 >
     <h1 class="mb-10 text-4xl font-bold">Emotion Detector</h1>
-
+    <button
+        on:click={toggleSound}
+        class="absolute left-4 top-4 p-2 text-2xl"
+        aria-label={isSoundOn ? 'Mute sound' : 'Unmute sound'}
+    >
+        {#if isSoundOn}
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path
+                    d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+                ></path>
+            </svg>
+        {:else}
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line
+                    x1="23"
+                    y1="9"
+                    x2="17"
+                    y2="15"
+                ></line>
+                <line
+                    x1="17"
+                    y1="9"
+                    x2="23"
+                    y2="15"
+                ></line>
+            </svg>
+        {/if}
+    </button>
     <video
         class="rounded-lg shadow-xl"
         id="video"
