@@ -43,9 +43,12 @@
         });
     }
 
-    function getStrongestEmotion(expressions: any): string {
+    function getStrongestEmotion(expressions: faceapi.FaceExpressions): string {
         return Object.keys(expressions).reduce((a, b) =>
-            expressions[a] > expressions[b] ? a : b
+            expressions[a as keyof faceapi.FaceExpressions] >
+            expressions[b as keyof faceapi.FaceExpressions]
+                ? a
+                : b
         );
     }
 
@@ -73,6 +76,10 @@
                 return '(>_<)';
             case 'fearful':
                 return '(o_o)';
+            case 'disgusted':
+                return '(x_x)';
+            case 'surprised':
+                return '(O_O)';
             default:
                 return '(•_•)';
         }
@@ -80,20 +87,18 @@
 </script>
 
 <main
-    class="flex min-h-screen flex-col items-center justify-center p-4 transition-colors duration-300 dark:bg-gray-900 dark:text-white sm:py-20"
+    class="flex min-h-screen flex-col items-center justify-center p-4 transition-colors duration-300 dark:bg-gray-900 dark:text-white sm:py-20 gap-5"
 >
-    <h1 class="mb-10 text-3xl font-bold">Emotion Detector</h1>
+    <h1 class="mb-10 text-4xl font-bold">Emotion Detector</h1>
 
     <video
-        class="rounded-lg"
+        class="rounded-lg shadow-xl"
         id="video"
-        width="320"
-        height="240"
         autoplay
         muted
-    ></video>
+    />
 
-    <div class="pt-10 my-2 font-mono text-4xl">
+    <div class="pt-10 my-2 font-mono text-6xl">
         {getAsciiface(emotion)}
     </div>
     <div class="my-2 text-xl">
