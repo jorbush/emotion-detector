@@ -6,10 +6,42 @@
     let isDarkMode: boolean = true;
 
     onMount(async () => {
+        await loadModels();
+        startVideo();
+
         const storedTheme = localStorage.getItem('theme');
         isDarkMode = storedTheme === 'dark';
         setTheme(isDarkMode);
     });
+
+    async function loadModels() {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+    }
+
+    function startVideo() {
+        const video = document.getElementById('video') as HTMLVideoElement;
+        navigator.mediaDevices
+            .getUserMedia({ video: {} })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => console.error(err));
+
+        video.addEventListener('play', () => {
+            setInterval(async () => {
+                const detections = await faceapi
+                    .detectSingleFace(
+                        video,
+                        new faceapi.TinyFaceDetectorOptions()
+                    )
+                    .withFaceExpressions();
+                if (detections) {
+                    emotion = getStrongestEmotion(detections.expressions);
+                }
+            }, 100);
+        });
+    }
 
     function getStrongestEmotion(expressions: any): string {
         return Object.keys(expressions).reduce((a, b) =>
@@ -48,11 +80,12 @@
 </script>
 
 <main
-    class="flex min-h-screen flex-col items-center p-4 py-10 transition-colors duration-300 dark:bg-gray-900 dark:text-white sm:py-20"
+    class="flex min-h-screen flex-col items-center justify-center p-4 transition-colors duration-300 dark:bg-gray-900 dark:text-white sm:py-20"
 >
-    <h1 class="mb-4 pt-20 text-3xl font-bold">Emotion Detector</h1>
+    <h1 class="mb-10 text-3xl font-bold">Emotion Detector</h1>
 
     <video
+        class="rounded-lg"
         id="video"
         width="320"
         height="240"
@@ -60,11 +93,11 @@
         muted
     ></video>
 
-    <div class="my-4 font-mono text-4xl">
+    <div class="pt-10 my-2 font-mono text-4xl">
         {getAsciiface(emotion)}
     </div>
-    <div class="mt-4 text-xl">
-        Current emotion: {emotion}
+    <div class="my-2 text-xl">
+        Mood: {emotion}
     </div>
     <button
         on:click={toggleTheme}
