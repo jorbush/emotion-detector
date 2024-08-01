@@ -19,6 +19,12 @@ npm install
 npm run dev
 ```
 
+## Linter
+
+```bash
+npm run check
+```
+
 ## Format
 
 ```bash
