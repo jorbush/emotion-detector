@@ -7,8 +7,8 @@ This app uses face-api.js to analyze facial expressions and displays an ASCII ro
 
 - Real-time emotion detection using face-api.js
 - ASCII robot face that mimics the user's emotional state
-- Dark/light theme toggle
-- Theme preference saved in local storage
+- Uses a voice synthesizer to tell the detected emotion
+- Dark/light theme
 
 ## Technologies Used
 

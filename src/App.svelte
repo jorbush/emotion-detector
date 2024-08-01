@@ -21,6 +21,9 @@
 
     function startVideo() {
         const video = document.getElementById('video') as HTMLVideoElement;
+        let lastEmotionTime = 0;
+        const cooldownPeriod = 4000;
+
         navigator.mediaDevices
             .getUserMedia({ video: {} })
             .then((stream) => {
@@ -37,7 +40,17 @@
                     )
                     .withFaceExpressions();
                 if (detections) {
-                    emotion = getStrongestEmotion(detections.expressions);
+                    const newEmotion = getStrongestEmotion(
+                        detections.expressions
+                    );
+                    if (newEmotion !== emotion) {
+                        emotion = newEmotion;
+                        const currentTime = Date.now();
+                        if (currentTime - lastEmotionTime > cooldownPeriod) {
+                            tellEmotion(emotion);
+                            lastEmotionTime = currentTime;
+                        }
+                    }
                 }
             }, 100);
         });
@@ -50,6 +63,18 @@
                 ? a
                 : b
         );
+    }
+
+    async function tellEmotion(emotion: string) {
+        try {
+            const utterance = new SpeechSynthesisUtterance(
+                `You look ${emotion}`
+            );
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        } catch (error) {
+            console.error('Error in text-to-speech:', error);
+        }
     }
 
     function toggleTheme() {
